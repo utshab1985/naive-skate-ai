@@ -1,0 +1,71 @@
+@import "tailwindcss";
+
+@plugin "@tailwindcss/container-queries";
+@plugin "@tailwindcss/typography";
+
+@theme {
+  --font-family-sans: var(--font-tsukimi-rounded), system-ui, -apple-system, sans-serif;
+  --line-height-none: 1.5;
+  --line-height-tight: 1.5;
+  --line-height-snug: 1.5;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.7;
+  --line-height-loose: 2;
+
+  /* Override line-heights for text size utilities */
+  --text-xs--line-height: 1.7;
+  --text-sm--line-height: 1.7;
+  --text-base--line-height: 1.7;
+  --text-lg--line-height: 1.7;
+  --text-xl--line-height: 1.7;
+  --text-2xl--line-height: 1.5;
+  --text-3xl--line-height: 1.5;
+  --text-4xl--line-height: 1.5;
+  --text-5xl--line-height: 1.5;
+  --text-6xl--line-height: 1.5;
+  --text-7xl--line-height: 1.5;
+  --text-8xl--line-height: 1.5;
+  --text-9xl--line-height: 1.5;
+}
+
+@layer base {
+
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentColor);
+  }
+
+  body {
+    font-family: var(--font-tsukimi-rounded), system-ui, -apple-system, sans-serif;
+    line-height: 1.5;
+  }
+
+  p, li, a {
+    line-height: 1.7;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    line-height: 1.5;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  html {
+    color-scheme: dark;
+  }
+}
+
+@supports (font: -apple-system-body) and (-webkit-appearance: none) {
+  img[loading="lazy"] {
+    clip-path: inset(0.6px);
+  }
+}
+
+a,
+input,
+button {
+  @apply focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-neutral-400 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-50 dark:focus-visible:ring-neutral-600 dark:focus-visible:ring-offset-neutral-900;
+}
