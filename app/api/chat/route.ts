@@ -1,12 +1,13 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
-import fs from 'fs';
-import path from 'path';
+import { existsSync, readFileSync } from 'fs';
+import { NextRequest, NextResponse } from 'next/server';
+import { join } from 'path';
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY as string);
 
-function getRelevantProducts(products: any[], userMessage: string) {
+function getRelevantProducts(products: any[], userMessage: string): any[] {
   const msg = userMessage.toLowerCase();
-  let filtered = products;
+  let filtered: any[] = products;
 
   if (msg.includes('wheel')) {
     filtered = products.filter((p: any) => (p.name || p.title || '').toLowerCase().includes('wheel'));
@@ -20,7 +21,7 @@ function getRelevantProducts(products: any[], userMessage: string) {
     filtered = products.filter((p: any) => (p.name || p.title || '').toLowerCase().includes('grip'));
   } else {
     const categories = ['deck', 'wheel', 'truck', 'bearing', 'grip'];
-    filtered = categories.flatMap(cat =>
+    filtered = categories.flatMap((cat: string) =>
       products.filter((p: any) => (p.name || p.title || '').toLowerCase().includes(cat)).slice(0, 2)
     );
   }
@@ -28,25 +29,25 @@ function getRelevantProducts(products: any[], userMessage: string) {
   return filtered.slice(0, 15);
 }
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest): Promise<NextResponse> {
   try {
     const body = await req.json();
-    const messages = body.messages;
+    const messages: any[] = body.messages;
 
     if (!messages || !Array.isArray(messages) || messages.length === 0) {
-      return Response.json({ role: 'assistant', content: 'Hi! Ask me anything about skateboards.' });
+      return NextResponse.json({ role: 'assistant', content: 'Hi! Ask me anything about skateboards.' });
     }
 
-    const lastMessage = messages[messages.length - 1]?.content;
+    const lastMessage: string = messages[messages.length - 1]?.content;
 
     if (!lastMessage || typeof lastMessage !== 'string' || lastMessage.trim().length < 2) {
-      return Response.json({ role: 'assistant', content: "I didn't quite catch that! Try asking me about skateboards, wheels, trucks, or your budget." });
+      return NextResponse.json({ role: 'assistant', content: "I didn't quite catch that! Try asking me about skateboards, wheels, trucks, or your budget." });
     }
 
-    const filePath = path.join(process.cwd(), 'reference', 'products.json');
+    const filePath = join(process.cwd(), 'reference', 'products.json');
     let products: any[] = [];
-    if (fs.existsSync(filePath)) {
-      const fileData = fs.readFileSync(filePath, 'utf8');
+    if (existsSync(filePath)) {
+      const fileData = readFileSync(filePath, 'utf8');
       products = JSON.parse(fileData);
     }
 
@@ -90,11 +91,11 @@ Strict Rules:
     const result = await chat.sendMessage(lastMessage);
     const content = result.response.text();
 
-    return Response.json({ role: 'assistant', content });
+    return NextResponse.json({ role: 'assistant', content });
 
   } catch (error: any) {
     console.error('Chat API Error:', error);
-    return Response.json({
+    return NextResponse.json({
       role: 'assistant',
       content: 'Sorry, I am having trouble right now. Please try again in a moment.'
     }, { status: 500 });
